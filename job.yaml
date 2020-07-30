@@ -1,0 +1,35 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: job-runner
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: job-runner
+            image: local/job-runner:2.0
+            imagePullPolicy: Never
+            env: 
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: moc-s3-credentials
+                  key: accesskey
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: moc-s3-credentials
+                  key: secretkey
+            command: ["python", "/batchjob/main.py"]
+            args:
+            - /batchjob/moc
+            - <gateway-url>
+            - <tag>
+            - <s3-bucket-domain>
+            - <input-path>
+            - <input-filename-prefix>
+            - <output-filename-prefix>
+          restartPolicy: OnFailure
