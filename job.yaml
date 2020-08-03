@@ -23,13 +23,14 @@ spec:
                 secretKeyRef:
                   name: moc-s3-credentials
                   key: secretkey
-            command: ["python", "/batchjob/main.py"]
             args:
+            - /batchjob/main.py
             - /batchjob/moc
-            - <gateway-url>
+            - <gateway_url>
             - <tag>
-            - <s3-bucket-domain>
-            - <input-path>
-            - <input-filename-prefix>
-            - <output-filename-prefix>
+            - <S3_domain_name>
+            - <S3_path>
+            - <input_filename_prefix>
+            - <output_filename_prefix>
+            - <any_other_flags>
           restartPolicy: OnFailure
