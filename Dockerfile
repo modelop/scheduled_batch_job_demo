@@ -3,7 +3,7 @@ FROM python:3.7-slim-buster
 # Download the ModelOp Center CLI
 RUN apt-get update
 RUN apt-get install curl -y
-RUN curl -o moc https://modelop-go-cli.s3.us-east-2.amazonaws.com/release/latest/linux/moc
+RUN curl -o moc https://modelop-go-cli.s3.us-east-2.amazonaws.com/release/v0.2.1-rc5/linux/moc
 RUN chmod +x moc
 
 WORKDIR batchjob
