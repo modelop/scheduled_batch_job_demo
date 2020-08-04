@@ -16,7 +16,7 @@ def get_most_recent_deployable_model_by_tag(tag, gateway_url):
                                 .json()['_embedded']['deployableModels']
     tag_filter = lambda x: tag in x['storedModel']['modelMetaData']['tags']
     tagged_deployable_models = list(filter(tag_filter, deployable_models))
-    
+
     key = lambda x: datetime.datetime\
                             .fromisoformat(x['createdDate'].rstrip('Z'))
     tagged_deployable_models = sorted(tagged_deployable_models, key=key)
@@ -28,10 +28,10 @@ def get_uuid(deployable_model):
     return sm_id
 
 def create_job(moc_binary,
-               uuid, 
-               input_file_loc, 
-               output_file_loc, 
-               job_type, 
+               uuid,
+               input_file_loc,
+               output_file_loc,
+               job_type,
                region):
     stdout = subprocess.check_output(
         [moc_binary,
@@ -42,7 +42,7 @@ def create_job(moc_binary,
          input_file_loc,
          output_file_loc,
         f"--region={region}"],
-        
+
         universal_newlines=True)
     job_id = stdout.strip().split(" ")[-1]
     return job_id
@@ -62,7 +62,10 @@ def get_s3_file(s3_header, s3_domain, path, filename):
     return f"{s3_header}://{S3_ACCESS_KEY}:{S3_SECRET_KEY}@{s3_domain}/{path}/{filename}"
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Job Creator")
+    parser = argparse.ArgumentParser(
+        description="Job Creator",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument('moc_binary', help='Path to the moc CLI\
                         binary.')
     parser.add_argument('gateway_url', help='URL which points to\
@@ -117,16 +120,16 @@ def run_job(args):
 
     init_moc_cli(moc_binary, gateway_url)
     model_uuid = get_uuid(deployable_model)
-    job_uuid = create_job(moc_binary, 
-                          model_uuid, 
-                          input_file, 
-                          output_file, 
+    job_uuid = create_job(moc_binary,
+                          model_uuid,
+                          input_file,
+                          output_file,
                           args.job_type,
                           args.region)
 
     timeout = datetime.datetime.now() + datetime.timedelta(seconds=args.timeout)
     while True:
-        
+
         if get_job_status(moc_binary, job_uuid) in ['ERROR', 'COMPLETE']:
             break
         if datetime.datetime.now() >= timeout:
